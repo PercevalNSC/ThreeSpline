@@ -11,9 +11,7 @@ class ThreeSpline
 
     #スプライン補間のための事前行列計算
     h = makeh()
-    w = makew(h)
-    m = makem(h)
-    v = makev(m,w)
+    v = makev(makem(h),makew(h))
 
     @a = makea(v)
     @b = makeb(v)
@@ -24,7 +22,7 @@ class ThreeSpline
   private def input_check(x,y)
     if (x.size != y.size) then
       puts "different size between x and y of input."
-      @status = 1
+      exit
     end
   end
   private def makeh()
@@ -36,7 +34,6 @@ class ThreeSpline
     return h
   end
   private def makew(h)
-    #need : y,h
     size = @ydata.size-1
     w = Array.new(size,0)
     for i in 1..size-1
@@ -46,7 +43,6 @@ class ThreeSpline
     return w
   end
   private def makem(h)
-    #need : h
     size = h.size
     m = Matrix.zero(size-1)
     left = m.to_a
@@ -111,23 +107,17 @@ class ThreeSpline
 
   #initializeで作られた配列をもとに、xsの値を計算する。
   def third_cubic_spline(xs)
-    if @status == 1 then
-      puts "different input array size."
-      return
-    end
-
     i = search_section(xs)
     hs = xs - @xdata[i]
-    return  @a[i] * hs**3 + @b[i] * hs**2 + @c[i] * hs + @d[i]
+    return  (@a[i]*hs**3) + (@b[i]*hs**2) + (@c[i]*hs) + @d[i]
   end
 
 end
 
-#test
 if __FILE__ == $0
 x = Array[115.2936, 162.95472, 232.77408, 309.28272000000004, 387.78528, 466.57728, 544.83864, 622.07088, 697.90416, 772.04904, 844.2160799999999, 914.19624, 981.7644, 1046.7276, 1108.8768, 1168.03512, 1224.04176, 1276.7359199999999, 1325.9568, 1371.57576, 1413.46416, 1451.49336, 1485.58296, 1515.6204, 1541.5252799999998, 1563.2171999999998, 1580.63184, 1593.75312, 1602.5167199999999, 1606.90656]
 y = Array[192.76704, 192.20424, 201.03215999999998, 207.85008000000002, 210.66407999999998, 211.22688, 211.11432, 207.73752, 201.46632000000002, 193.37808, 184.21248, 174.41976, 164.3376, 154.15896, 143.98031999999998, 133.89816, 123.94463999999999, 114.11976000000001, 104.45568, 94.9524, 85.57776000000001, 76.33176, 67.23048, 58.241760000000006, 49.38168, 40.650240000000004, 32.0796, 23.78232, 16.19256, 10.95048]
 tspline = ThreeSpline.new(x,y)
-section = 1556
+section = 200
 puts tspline.third_cubic_spline(section)
 end
